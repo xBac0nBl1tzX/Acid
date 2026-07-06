@@ -192,6 +192,130 @@ Close.MouseButton1Click:Connect(function()
 	ScreenGui:Destroy()
 end)
 
+function Acid:CreateSplash(settings)
+
+	local text = settings.Text or "Loading..."
+
+	local splash = Instance.new("Frame")
+	splash.Size = UDim2.new(1,0,1,0)
+	splash.BackgroundColor3 = Color3.fromRGB(0,0,0)
+	splash.BorderSizePixel = 0
+	splash.ZIndex = 999
+	splash.Parent = ScreenGui
+
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(1,0,1,0)
+	label.BackgroundTransparency = 1
+	label.Font = Enum.Font.GothamBold
+	label.Text = ""
+	label.TextSize = 28
+	label.TextColor3 = Color3.fromRGB(0,255,120)
+	label.ZIndex = 1000
+	label.Parent = splash
+
+	-- fade in
+	splash.BackgroundTransparency = 1
+	TweenService:Create(splash, TweenInfo.new(0.3), {
+		BackgroundTransparency = 0
+	}):Play()
+
+	-- typewriter
+	for i = 1, #text do
+		label.Text = string.sub(text,1,i)
+		task.wait(0.05)
+	end
+
+	task.wait(1.5)
+
+	-- fade out
+	TweenService:Create(splash, TweenInfo.new(0.3), {
+		BackgroundTransparency = 1
+	}):Play()
+
+	TweenService:Create(label, TweenInfo.new(0.3), {
+		TextTransparency = 1
+	}):Play()
+
+	task.wait(0.35)
+
+	splash:Destroy()
+end
+
+local NotificationHolder = Instance.new("Frame")
+NotificationHolder.Size = UDim2.new(0,320,1,-30)
+NotificationHolder.Position = UDim2.new(1,-15,0,15)
+NotificationHolder.AnchorPoint = Vector2.new(1,0)
+NotificationHolder.BackgroundTransparency = 1
+NotificationHolder.Parent = ScreenGui
+
+local list = Instance.new("UIListLayout")
+list.Padding = UDim.new(0,8)
+list.SortOrder = Enum.SortOrder.LayoutOrder
+list.Parent = NotificationHolder
+
+
+function Acid:CreateNotif(settings)
+
+	local title = settings.Title or "Notification"
+	local text = settings.Text or ""
+	local duration = settings.Duration or 3
+
+	local notif = Instance.new("Frame")
+	notif.Size = UDim2.new(0,300,0,70)
+	notif.BackgroundColor3 = Color3.fromRGB(18,18,18)
+	notif.BorderSizePixel = 0
+	notif.Parent = NotificationHolder
+	notif.ClipsDescendants = true
+
+	Instance.new("UICorner", notif).CornerRadius = UDim.new(0,8)
+
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Color3.fromRGB(0,255,120)
+	stroke.Thickness = 2
+	stroke.Parent = notif
+
+	local t1 = Instance.new("TextLabel")
+	t1.BackgroundTransparency = 1
+	t1.Position = UDim2.new(0,10,0,6)
+	t1.Size = UDim2.new(1,-20,0,20)
+	t1.Text = title
+	t1.Font = Enum.Font.GothamBold
+	t1.TextColor3 = Color3.fromRGB(0,255,120)
+	t1.TextSize = 16
+	t1.TextXAlignment = Enum.TextXAlignment.Left
+	t1.Parent = notif
+
+	local t2 = Instance.new("TextLabel")
+	t2.BackgroundTransparency = 1
+	t2.Position = UDim2.new(0,10,0,28)
+	t2.Size = UDim2.new(1,-20,0,35)
+	t2.Text = text
+	t2.Font = Enum.Font.Gotham
+	t2.TextColor3 = Color3.fromRGB(255,255,255)
+	t2.TextSize = 13
+	t2.TextWrapped = true
+	t2.TextXAlignment = Enum.TextXAlignment.Left
+	t2.Parent = notif
+
+	-- start offscreen
+	notif.Position = UDim2.new(1,350,0,0)
+
+	TweenService:Create(notif, TweenInfo.new(0.25, Enum.EasingStyle.Quart), {
+		Position = UDim2.new(0,0,0,0)
+	}):Play()
+
+	task.delay(duration, function()
+
+		TweenService:Create(notif, TweenInfo.new(0.25, Enum.EasingStyle.Quart), {
+			Position = UDim2.new(1,350,0,0)
+		}):Play()
+
+		task.wait(0.3)
+		notif:Destroy()
+
+	end)
+end
+
 --// TABS
 local CurrentTab = nil
 
