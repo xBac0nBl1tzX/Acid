@@ -193,41 +193,120 @@ Close.MouseButton1Click:Connect(function()
 end)
 
 --// TABS
-local CurrentTab
+local CurrentTab = nil
 
 function Acid:CreateTab(name)
+
+	--// TAB BUTTON (LEFT SIDEBAR)
 	local tabBtn = Instance.new("TextButton")
 	tabBtn.Size = UDim2.new(1,0,0,32)
 	tabBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
 	tabBtn.Text = name
 	tabBtn.TextColor3 = Color3.fromRGB(255,255,255)
 	tabBtn.Font = Enum.Font.GothamBold
+	tabBtn.TextSize = 14
 	tabBtn.Parent = Sidebar
 	Instance.new("UICorner", tabBtn).CornerRadius = UDim.new(0,6)
 
+	--// TAB PAGE (CONTENT AREA)
 	local page = Instance.new("ScrollingFrame")
 	page.Size = UDim2.new(1,0,1,0)
 	page.BackgroundTransparency = 1
+	page.BorderSizePixel = 0
 	page.Visible = false
+	page.ScrollBarThickness = 4
+	page.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	page.CanvasSize = UDim2.new(0,0,0,0)
 	page.Parent = Content
 
-	local layout = Instance.new("UIListLayout", page)
+	local layout = Instance.new("UIListLayout")
 	layout.Padding = UDim.new(0,8)
+	layout.SortOrder = Enum.SortOrder.LayoutOrder
+	layout.Parent = page
 
-	local Tab = {Page = page}
+	local padding = Instance.new("UIPadding")
+	padding.PaddingTop = UDim.new(0,10)
+	padding.PaddingLeft = UDim.new(0,10)
+	padding.PaddingRight = UDim.new(0,10)
+	padding.PaddingBottom = UDim.new(0,10)
+	padding.Parent = page
 
+	--// TAB OBJECT
+	local Tab = {}
+	Tab.Page = page
+
+	--// FIRST TAB AUTO SELECT
 	if not CurrentTab then
 		CurrentTab = Tab
 		page.Visible = true
+		tabBtn.BackgroundColor3 = Color3.fromRGB(0,255,120)
+		tabBtn.TextColor3 = Color3.fromRGB(12,12,12)
 	end
 
+	--// TAB SWITCH
 	tabBtn.MouseButton1Click:Connect(function()
+
 		if CurrentTab then
 			CurrentTab.Page.Visible = false
 		end
+
 		CurrentTab = Tab
 		page.Visible = true
+
 	end)
+
+	---------------------------------------------------
+	-- 🔘 BUTTON
+	---------------------------------------------------
+	function Tab:CreateButton(data)
+
+		local btn = Instance.new("TextButton")
+		btn.Size = UDim2.new(1,0,0,36)
+		btn.BackgroundColor3 = Color3.fromRGB(30,30,30)
+		btn.Text = data.Title or "Button"
+		btn.TextColor3 = Color3.fromRGB(255,255,255)
+		btn.Font = Enum.Font.GothamBold
+		btn.TextSize = 14
+		btn.Parent = page
+		Instance.new("UICorner", btn).CornerRadius = UDim.new(0,8)
+
+		btn.MouseButton1Click:Connect(function()
+			task.spawn(function()
+				pcall(function()
+					if data.Callback then data.Callback() end
+				end)
+			end)
+		end)
+
+		return btn
+	end
+
+	---------------------------------------------------
+	-- 🔘 TOGGLE
+	---------------------------------------------------
+	function Tab:CreateToggle(data)
+
+		local state = data.Default or false
+
+		local holder = Instance.new("Frame")
+		holder.Size = UDim2.new(1,0,0,38)
+		holder.BackgroundColor3 = Color3.fromRGB(30,30,30)
+		holder.BorderSizePixel = 0
+		holder.Parent = page
+		Instance.new("UICorner", holder).CornerRadius = UDim.new(0,8)
+
+		local label = Instance.new("TextLabel")
+		label.BackgroundTransparency = 1
+		label.Size = UDim2.new(1,-80,1,0)
+		label.Position = UDim2.new(0,10,0,0)
+		label.Text = data.Title or "Toggle"
+		label.TextColor3 = Color3.fromRGB(255,255,255)
+		label.Font = Enum.Font.GothamBold
+		label.TextSize = 14
+		label.TextXAlignment = Enum.TextXAlignment.Left
+		label.Parent = holder
+
+		local back = Instance.new("Frame")
 
 	--// BUTTON FIXED
 	function Tab:CreateButton(data)
